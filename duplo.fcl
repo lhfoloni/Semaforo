@@ -1,0 +1,118 @@
+FUNCTION_BLOCK duplo
+
+VAR_INPUT
+  carros: REAL; (* RANGE(0 .. 1) *)
+  pessoas: REAL;(* RANGE(0 .. 15) *)
+END_VAR
+
+VAR_OUTPUT
+  tempo: REAL;(* RANGE((10 .. 60) *)
+  qual: REAL;(* RANGE((0 .. 1) *)
+END_VAR
+
+FUZZIFY carros
+  TERM muitoBaixoCarro := sigm -46 0.11;
+  TERM baixoCarro := trape 0.1 0.2 0.35 0.45;
+  TERM medioCarro := (0.4,0) (0.5,1) (0.6,0);
+  TERM altoCarro := trape 0.55 0.65 0.8 0.9;
+  TERM muitoAltoCarro := sigm 46 0.895;
+END_FUZZIFY
+
+FUZZIFY pessoas
+  TERM muitoBaixoPessoa := sigm -46 0.11;
+  TERM baixoPessoa := trape 0.1 0.2 0.35 0.45;
+  TERM medioPessoa := (0.4,0) (0.5,1) (0.6,0);
+  TERM altoPessoa := trape 0.55 0.65 0.8 0.9;
+  TERM muitoAltoPessoa := sigm 46 0.895;
+END_FUZZIFY
+
+
+DEFUZZIFY tempo
+  TERM muitoBaixoTempo := sigm -0.951 14.6;
+  TERM baixoTempo := gauss 20 2.5;
+  TERM medioBaixoTempo := gauss 30 2.5;
+  TERM medioAltoTempo := gauss 40 2.5;
+  TERM altoTempo := gauss 50 2.5;
+  TERM muitoAltoTempo := sigm  1.31 55.86;
+  METHOD : COG;
+END_DEFUZZIFY
+
+DEFUZZIFY qual
+  TERM carro := sigm -1661 0.5;
+  TERM pessoa := sigm 1661 0.5;
+  METHOD : COG;
+END_DEFUZZIFY
+
+
+RULEBLOCK first
+
+  AND: MIN;
+  OR: MAX;	
+  ACT: MIN;
+  ACCU : MAX;
+
+
+Rule 1	: if carros is muitoBaixoCarro	and pessoas is muitoBaixoPessoa	then tempo is baixoTempo;
+Rule 2	: if carros is baixoCarro	and pessoas is muitoBaixoPessoa	then tempo is baixoTempo;
+Rule 3	: if carros is medioCarro	and pessoas is muitoBaixoPessoa	then tempo is medioBaixoTempo;
+Rule 4	: if carros is altoCarro	and pessoas is muitoBaixoPessoa	then tempo is medioAltoTempo;
+Rule 5	: if carros is muitoAltoCarro	and pessoas is muitoBaixoPessoa	then tempo is altoTempo;
+Rule 6	: if carros is muitoBaixoCarro	and pessoas is baixoPessoa	then tempo is baixoTempo;
+Rule 7	: if carros is baixoCarro	and pessoas is baixoPessoa	then tempo is medioBaixoTempo;
+Rule 8	: if carros is medioCarro	and pessoas is baixoPessoa	then tempo is muitoBaixoTempo;
+Rule 9	: if carros is altoCarro	and pessoas is baixoPessoa	then tempo is medioBaixoTempo;
+Rule 10	: if carros is muitoAltoCarro	and pessoas is baixoPessoa	then tempo is medioAltoTempo;
+Rule 11	: if carros is muitoBaixoCarro	and pessoas is medioPessoa	then tempo is medioAltoTempo;
+Rule 12	: if carros is baixoCarro	and pessoas is medioPessoa	then tempo is medioBaixoTempo;
+Rule 13	: if carros is medioCarro	and pessoas is medioPessoa	then tempo is baixoTempo;
+Rule 14	: if carros is altoCarro	and pessoas is medioPessoa	then tempo is baixoTempo;
+Rule 15	: if carros is muitoAltoCarro	and pessoas is medioPessoa	then tempo is medioBaixoTempo;
+Rule 16	: if carros is muitoBaixoCarro	and pessoas is altoPessoa	then tempo is altoTempo;
+Rule 17	: if carros is baixoCarro	and pessoas is altoPessoa	then tempo is medioAltoTempo;
+Rule 18	: if carros is medioCarro	and pessoas is altoPessoa	then tempo is medioBaixoTempo;
+Rule 19	: if carros is altoCarro	and pessoas is altoPessoa	then tempo is baixoTempo;
+Rule 20	: if carros is muitoAltoCarro	and pessoas is altoPessoa	then tempo is muitoBaixoTempo;
+Rule 21	: if carros is muitoBaixoCarro	and pessoas is muitoAltoPessoa	then tempo is muitoAltoTempo;
+Rule 22	: if carros is baixoCarro	and pessoas is muitoAltoPessoa	then tempo is altoTempo;
+Rule 23	: if carros is medioCarro	and pessoas is muitoAltoPessoa	then tempo is medioAltoTempo;
+Rule 24	: if carros is altoCarro	and pessoas is muitoAltoPessoa	then tempo is medioBaixoTempo;
+Rule 25	: if carros is muitoAltoCarro	and pessoas is muitoAltoPessoa	then tempo is baixoTempo;
+
+END_RULEBLOCK
+
+RULEBLOCK second
+
+  AND: MIN;
+  OR: MAX;  
+  ACT: MIN;
+  ACCU : MAX;
+
+
+Rule 1  : if carros is muitoBaixoCarro    and pessoas is muitoBaixoPessoa	then qual is pessoa;
+Rule 2  : if carros is baixoCarro     and pessoas is muitoBaixoPessoa	then qual is carro;
+Rule 3  : if carros is medioCarro     and pessoas is muitoBaixoPessoa	then qual is carro;
+Rule 4  : if carros is altoCarro    and pessoas is muitoBaixoPessoa	then qual is carro;
+Rule 5  : if carros is muitoAltoCarro     and pessoas is muitoBaixoPessoa	then qual is carro;
+Rule 6  : if carros is muitoBaixoCarro    and pessoas is baixoPessoa	then qual is pessoa;
+Rule 7  : if carros is baixoCarro     and pessoas is baixoPessoa	then qual is pessoa;
+Rule 8  : if carros is medioCarro     and pessoas is baixoPessoa	then qual is carro;
+Rule 9  : if carros is altoCarro    and pessoas is baixoPessoa	then qual is carro;
+Rule 10 : if carros is muitoAltoCarro     and pessoas is baixoPessoa	then qual is carro;
+Rule 11 : if carros is muitoBaixoCarro    and pessoas is medioPessoa	then qual is pessoa;
+Rule 12 : if carros is baixoCarro     and pessoas is medioPessoa	then qual is pessoa;
+Rule 13 : if carros is medioCarro     and pessoas is medioPessoa	then qual is pessoa;
+Rule 14 : if carros is altoCarro    and pessoas is medioPessoa	then qual is carro;
+Rule 15 : if carros is muitoAltoCarro     and pessoas is medioPessoa	then qual is carro;
+Rule 16 : if carros is muitoBaixoCarro    and pessoas is altoPessoa	then qual is pessoa;
+Rule 17 : if carros is baixoCarro     and pessoas is altoPessoa	then qual is pessoa;
+Rule 18 : if carros is medioCarro     and pessoas is altoPessoa	then qual is pessoa;
+Rule 19 : if carros is altoCarro    and pessoas is altoPessoa	then qual is pessoa;
+Rule 20 : if carros is muitoAltoCarro     and pessoas is altoPessoa	then qual is carro;
+Rule 21 : if carros is muitoBaixoCarro    and pessoas is muitoAltoPessoa	then qual is pessoa;
+Rule 22 : if carros is baixoCarro     and pessoas is muitoAltoPessoa	then qual is pessoa;
+Rule 23 : if carros is medioCarro     and pessoas is muitoAltoPessoa	then qual is pessoa;
+Rule 24 : if carros is altoCarro    and pessoas is muitoAltoPessoa	then qual is pessoa;
+Rule 25 : if carros is muitoAltoCarro     and pessoas is muitoAltoPessoa	then qual is pessoa;
+END_RULEBLOCK
+
+END_FUNCTION_BLOCK
